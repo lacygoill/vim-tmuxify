@@ -1,7 +1,7 @@
 " complete_panes {{{1
 
 fu! s:complete_descriptor(...) abort
-    return system('tmux list-panes -aF "#S:#I.#P"')
+    sil return system('tmux list-panes -aF "#S:#I.#P"')
 endfu
 
 " fixstr {{{1
@@ -85,11 +85,11 @@ endfu
 "         %456 study 1 2
 
 fu! s:get_pane_descriptor_from_id(pane_id) abort
-    let descriptor_list = systemlist(
-                        \            "tmux list-panes -a -F '#D #S #I #P' | awk 'substr($1, 2) == "
-                        \            . a:pane_id
-                        \            . " { print $2, $3, $4 }'"
-                        \           )
+    sil let descriptor_list = systemlist(
+        \  "tmux list-panes -a -F '#D #S #I #P' | awk 'substr($1, 2) == "
+        \  . a:pane_id
+        \  . " { print $2, $3, $4 }'"
+        \ )
 
     if empty(descriptor_list) || descriptor_list[0] == 'failed to connect to server: Connection refused'
         return ''
@@ -118,7 +118,7 @@ fu! tmuxify#pane_command(bang, ...) abort
         return
     endif
 
-    call system('tmux ' . a:1 . ' -t '. pane_descriptor)
+    sil call system('tmux ' . a:1 . ' -t '. pane_descriptor)
 endfu
 
 " pane_create() {{{1
@@ -142,10 +142,10 @@ fu! tmuxify#pane_create(bang, ...) abort
     " pane_id is unique, pane_index will change if the pane is moved
     let cmd = get(g:, 'tmuxify_custom_command', 'tmux split-window -d')
             \ ." -PF '#D #S #I #P' | awk '{id=$1; session=$2; window=$3; pane=$4} END { print substr(id, 2), session, window, pane }'"
-    let [ pane_id, session, window, pane ] = map(
-                                           \     split(system(cmd), ' '),
-                                           \     'str2nr(v:val)'
-                                           \    )
+    sil let [ pane_id, session, window, pane ] = map(
+        \  split(system(cmd), ' '),
+        \  'str2nr(v:val)'
+        \ )
 
     if exists('a:1')
         call tmuxify#pane_send(a:bang, a:1)
@@ -170,7 +170,7 @@ fu! tmuxify#pane_kill(bang) abort
     if empty(pane_descriptor)
         echom 'tmuxify: The associated pane was already closed! Run :TxCreate.'
     else
-        call system('tmux kill-pane -t '. pane_descriptor)
+        sil call system('tmux kill-pane -t '. pane_descriptor)
     endif
 
     unlet {scope}pane_id
@@ -220,14 +220,14 @@ fu! tmuxify#pane_send(bang, ...) abort
     if exists('a:1')
         for line in split(a:1, '\n')
             " `-l` disables key name lookup and sends the keys literally
-            call system(
-                        \ 'tmux send-keys -t '.pane_descriptor
-                        \ .' -l '.shellescape(s:fixstr(line))
-                        \ .' && tmux send-keys -t '.pane_descriptor
-                        \ .' C-m')
+            sil call system(
+                \ 'tmux send-keys -t '.pane_descriptor
+                \ .' -l '.shellescape(s:fixstr(line))
+                \ .' && tmux send-keys -t '.pane_descriptor
+                \ .' C-m')
         endfor
     else
-        call system(
+        sil call system(
                     \ 'tmux send-keys -t '.pane_descriptor
                     \ .' '.shellescape(s:fixstr(input('TxSend> ')))
                     \ .' C-m')
@@ -253,7 +253,7 @@ fu! tmuxify#pane_send_key(bang, cmd) abort
     endif
 
     let keys = empty(a:cmd) ? input('TxSendKey> ') : a:cmd
-    call system('tmux send-keys -t '.pane_descriptor.' '.string(keys))
+    sil call system('tmux send-keys -t '.pane_descriptor.' '.string(keys))
 endfu
 
 " pane_set() {{{1
@@ -279,15 +279,15 @@ fu! tmuxify#pane_set(bang, ...) abort
 
     let [ {scope}session, {scope}window, {scope}pane ] = [ session, window, pane ]
 
-    let pane_id = system(
-                \        "tmux list-panes -a -F '#D #S #I #P' | awk '$2 == \""
-                \        .session
-                \        ."\" && $3 == \""
-                \        .window
-                \        ."\" && $4 == \""
-                \        .pane
-                \        ."\" {print substr($1, 2)}'"
-                \       )
+    sil let pane_id = system(
+        \  "tmux list-panes -a -F '#D #S #I #P' | awk '$2 == \""
+        \  .session
+        \  ."\" && $3 == \""
+        \  .window
+        \  ."\" && $4 == \""
+        \  .pane
+        \  ."\" {print substr($1, 2)}'"
+        \ )
 
     if empty(pane_id)
         redraw | echom 'tmuxify: There is no pane '.pane.'!'
