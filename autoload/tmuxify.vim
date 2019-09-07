@@ -40,7 +40,7 @@ endfu
 " A pane descriptor follows the format `session_name:window_index.pane_index`; ex:
 "         study:1.2
 
-"         let descriptor_list = systemlist(
+"         sil let descriptor_list = systemlist(
 "                     \ "tmux list-panes -a -F '#D #S #I #P'"
 "                     \ ."| awk 'substr($1, 2) == ".s:pane_id." { print $2, $3, $4 }'"
 "                     \ )
@@ -49,7 +49,7 @@ endfu
 "         let pane_descriptor = session.':'.window .'.'.pane
 
 " I got this code by reading the plugin `vim-tmuxify`:
-"         https://github.com/jebaum/vim-tmuxify/blob/master/autoload/tmuxify.vim
+" https://github.com/jebaum/vim-tmuxify/blob/master/autoload/tmuxify.vim
 "
 " In particular the function `s:get_pane_descriptor_from_id()`.
 " The functions `pane_create()` and `pane_kill()` are also interesting.
