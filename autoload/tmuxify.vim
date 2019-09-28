@@ -21,12 +21,12 @@ fu! s:fixstr(line) abort
     " https://github.com/jebaum/vim-tmuxify/issues/11
     "
     " Compare:
-    "                                          ┌─ removed
+    "                                          ┌ removed
     "                                          │
     " pfx : send-keys -t study:1.2 -l 'echo foo;'
     " pfx : send-keys -t study:1.2 -l 'echo foo\;'
     "                                           │
-    "                                           └─ NOT removed
+    "                                           └ NOT removed
     return line[-1:] == ';' ? line[:-2].'\;' : line
 endfu
 
@@ -57,26 +57,26 @@ endfu
 " Explanation:
 " Example of command executed by `systemlist()`:
 "
-"                          ┌─ list all the panes, not just the ones in the current window
-"                          │  ┌─ format the output of the command; here according to the string:
+"                          ┌ list all the panes, not just the ones in the current window
+"                          │  ┌ format the output of the command; here according to the string:
 "                          │  │          '#D #S #I #P'
 "                          │  │            │  │  │  │
-"                          │  │            │  │  │  └─ index of pane
-"                          │  │            │  │  └─ index of window
-"                          │  │            │  └─ name of session
-"                          │  │            └─ unique pane ID (ex: %42)
+"                          │  │            │  │  │  └ index of pane
+"                          │  │            │  │  └ index of window
+"                          │  │            │  └ name of session
+"                          │  │            └ unique pane ID (ex: %42)
 "                          │  │
 "         tmux list-panes -a -F '#D #S #I #P' | awk 'substr($1, 2) == 456 { print $2, $3, $4 }'
 "                                                    │                            │
-"                                                    │                            └─ print:
+"                                                    │                            └ print:
 "                                                    │                                 session name
 "                                                    │                                 window index
 "                                                    │                                 pane index
 "                                                    │
-"                                                    └─ remove the `%` prefix from the 1st field
-"                                                       and compare the pane ID with `456`;
-"                                                       `456` is the unique pane ID of the pane
-"                                                       we're interested in
+"                                                    └ remove the `%` prefix from the 1st field
+"                                                      and compare the pane ID with `456`;
+"                                                      `456` is the unique pane ID of the pane
+"                                                      we're interested in
 "
 " Example of output for the command `tmux list-panes -a -F '#D #S #I #P'`:
 "
@@ -238,8 +238,8 @@ endfu
 fu! tmuxify#pane_send_key(bang, cmd) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
-    "  ┌─ if we don't have any info about a pane
-    "  │                           ┌─ and we can't even create one
+    "  ┌ if we don't have any info about a pane
+    "  │                           ┌ and we can't even create one
     "  │                           │
     if !exists(scope.'pane_id') && !tmuxify#pane_create(a:bang)
         " gtfo

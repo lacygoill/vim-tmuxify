@@ -32,13 +32,13 @@ com! -nargs=? -bar -bang  TxSetPane    call tmuxify#pane_set(      <bang>0, <f-a
 "         nno <silent>  <bar>xs  :<c-u>TxSend<cr>
 "         nno <silent>  <bar>xt  :<c-u>TxSetCmd<cr>
 "
-"                       ┌─ do NOT use `!x`, it would prevent you from writing a visual selection
-"                       │  on the standard input of a shell command whose name begins with an `x`
+"                       ┌ do NOT use `!x`, it would prevent you from writing a visual selection
+"                       │ on the standard input of a shell command whose name begins with an `x`
 "                       │
-"                       │  do NOT use `!<c-x>`, it would introduce lag when we press `!` in visual mode
+"                       │ do NOT use `!<c-x>`, it would introduce lag when we press `!` in visual mode
 "                       │
-"                       │  do NOT use `<c-x>!`, it would introduce lag when we want to decrease numbers
+"                       │ do NOT use `<c-x>!`, it would introduce lag when we want to decrease numbers
 "                       │
-"                       │  you COULD use `mx` though
+"                       │ you COULD use `mx` though
 "                       │
 "         xno <silent>  <bar>x  "my:TxSend(@m)<cr>
