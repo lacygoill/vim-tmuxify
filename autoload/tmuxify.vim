@@ -1,12 +1,12 @@
 " complete_panes {{{1
 
-fu! s:complete_descriptor(...) abort
+fu s:complete_descriptor(...) abort
     sil return system('tmux list-panes -aF "#S:#I.#P"')
 endfu
 
 " fixstr {{{1
 
-fu! s:fixstr(line) abort
+fu s:fixstr(line) abort
     let line = substitute(a:line, '\t', ' ', 'g')
 
     " remove possible spaces after an ending backslash;
@@ -84,7 +84,7 @@ endfu
 "         %123 study 1 2
 "         %456 study 1 2
 
-fu! s:get_pane_descriptor_from_id(pane_id) abort
+fu s:get_pane_descriptor_from_id(pane_id) abort
     sil let descriptor_list = systemlist(
         \  "tmux list-panes -a -F '#D #S #I #P' | awk 'substr($1, 2) == "
         \  . a:pane_id
@@ -103,7 +103,7 @@ endfu
 
 " pane_command() {{{1
 
-fu! tmuxify#pane_command(bang, ...) abort
+fu tmuxify#pane_command(bang, ...) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope.'pane_id')
@@ -123,7 +123,7 @@ endfu
 
 " pane_create() {{{1
 
-fu! tmuxify#pane_create(bang, ...) abort
+fu tmuxify#pane_create(bang, ...) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists('$TMUX')
@@ -157,7 +157,7 @@ endfu
 
 " pane_kill() {{{1
 
-fu! tmuxify#pane_kill(bang) abort
+fu tmuxify#pane_kill(bang) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope.'pane_id')
@@ -178,7 +178,7 @@ endfu
 
 " pane_run() {{{1
 
-fu! tmuxify#pane_run(bang, ...) abort
+fu tmuxify#pane_run(bang, ...) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope.'pane_id') && !tmuxify#pane_create(a:bang)
@@ -203,7 +203,7 @@ endfu
 
 " pane_send() {{{1
 
-fu! tmuxify#pane_send(bang, ...) abort
+fu tmuxify#pane_send(bang, ...) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope.'pane_id') && !tmuxify#pane_create(a:bang)
@@ -235,7 +235,7 @@ fu! tmuxify#pane_send(bang, ...) abort
 endfu
 " pane_send_key() {{{1
 
-fu! tmuxify#pane_send_key(bang, cmd) abort
+fu tmuxify#pane_send_key(bang, cmd) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
     "  ┌ if we don't have any info about a pane
@@ -258,7 +258,7 @@ endfu
 
 " pane_set() {{{1
 
-fu! tmuxify#pane_set(bang, ...) abort
+fu tmuxify#pane_set(bang, ...) abort
     let scope = !a:bang ? 'b:' : 'g:'
 
     if a:0 == 1
@@ -277,7 +277,7 @@ fu! tmuxify#pane_set(bang, ...) abort
         let [session, window, pane] = split(descriptor, '\W')
     endif
 
-    let [ {scope}session, {scope}window, {scope}pane ] = [ session, window, pane ]
+    let [ {scope}session, {scope}window, {scope}pane ] = [session, window, pane]
 
     sil let pane_id = system(
         \  "tmux list-panes -a -F '#D #S #I #P' | awk '$2 == \""
@@ -299,7 +299,7 @@ endfu
 
 " set_cmd {{{1
 
-fu! tmuxify#set_cmd(...) abort
+fu tmuxify#set_cmd(...) abort
     let g:tmuxify_run     = get(g:, 'tmuxify_run', {})
     let ft                = !empty(&ft)   ? &ft : ' '
     let g:tmuxify_run[ft] = exists('a:1') ? a:1 : input('TxSet('.ft.')> ')
@@ -307,6 +307,6 @@ endfu
 
 " SID {{{1
 
-fu! s:SID() abort
+fu s:SID() abort
     return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
 endfu

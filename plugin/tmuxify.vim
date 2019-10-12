@@ -4,17 +4,17 @@
 "         current buffer  if no bang
 "         current session if    bang
 "
-" Do we use global tmux panes or buffer local ones ? ───────────────┐
-"                                                                   │
-com! -nargs=0 -bar -bang  TxCancel     call tmuxify#pane_send_key( <bang>0, 'C-c'    )
-com! -nargs=0 -bar -bang  TxClear      call tmuxify#pane_send_key( <bang>0, 'C-l'    )
-com! -nargs=? -bar -bang  TxCreate     call tmuxify#pane_create(   <bang>0, <args>   )
-com! -nargs=0 -bar -bang  TxKill       call tmuxify#pane_kill(     <bang>0           )
-com! -nargs=? -bar -bang  TxRun        call tmuxify#pane_run(      <bang>0, <args>   )
-com! -nargs=? -bar -bang  TxSend       call tmuxify#pane_send(     <bang>0, <args>   )
-com! -nargs=? -bar -bang  TxSendKey    call tmuxify#pane_send_key( <bang>0, <q-args> )
-com! -nargs=? -bar        TxSetCmd     call tmuxify#set_cmd(                <args>   )
-com! -nargs=? -bar -bang  TxSetPane    call tmuxify#pane_set(      <bang>0, <f-args> )
+" Do we use global tmux panes or buffer local ones ? ──────────────┐
+"                                                                  │
+com -nargs=0 -bar -bang  TxCancel     call tmuxify#pane_send_key( <bang>0, 'C-c'    )
+com -nargs=0 -bar -bang  TxClear      call tmuxify#pane_send_key( <bang>0, 'C-l'    )
+com -nargs=? -bar -bang  TxCreate     call tmuxify#pane_create(   <bang>0, <args>   )
+com -nargs=0 -bar -bang  TxKill       call tmuxify#pane_kill(     <bang>0           )
+com -nargs=? -bar -bang  TxRun        call tmuxify#pane_run(      <bang>0, <args>   )
+com -nargs=? -bar -bang  TxSend       call tmuxify#pane_send(     <bang>0, <args>   )
+com -nargs=? -bar -bang  TxSendKey    call tmuxify#pane_send_key( <bang>0, <q-args> )
+com -nargs=? -bar        TxSetCmd     call tmuxify#set_cmd(                <args>   )
+com -nargs=? -bar -bang  TxSetPane    call tmuxify#pane_set(      <bang>0, <f-args> )
 
 " mappings {{{1
 
