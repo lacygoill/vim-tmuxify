@@ -23,14 +23,14 @@ fu s:fixstr(line) abort "{{{1
     " pfx : send-keys -t study:1.2 -l 'echo foo\;'
     "                                           │
     "                                           └ NOT removed
-    return line[-1:] == ';' ? line[:-2]..'\;' : line
+    return line[-1:] == ';' ? line[:-2] .. '\;' : line
 endfu
 
 fu s:get_pane_descriptor_from_id(pane_id) abort "{{{1
     sil let descriptor_list = systemlist(
         \  "tmux list-panes -a -F '#D #S #I #P' | awk 'substr($1, 2) == "
-        \ ..a:pane_id
-        \ .." { print $2, $3, $4 }'"
+        \ .. a:pane_id
+        \ .. " { print $2, $3, $4 }'"
         \ )
 
     if empty(descriptor_list) || descriptor_list[0] == 'failed to connect to server: Connection refused'
@@ -39,7 +39,7 @@ fu s:get_pane_descriptor_from_id(pane_id) abort "{{{1
         " there should only ever be one item in descriptor_list, since it was
         " filtered for matching the unique pane_id
         let [session, window, pane] = split(descriptor_list[0],' ')
-        return session..':'..window..'.'..pane
+        return session .. ':' .. window .. '.' .. pane
     endif
 endfu
 
@@ -55,12 +55,12 @@ endfu
 "     study:1.2
 "
 "     sil let descriptor_list = systemlist(
-"                 \ "tmux list-panes -a -F '#D #S #I #P'"
-"                 \ ."| awk 'substr($1, 2) == ".s:pane_id." { print $2, $3, $4 }'"
-"                 \ )
+"         \ "tmux list-panes -a -F '#D #S #I #P'"
+"         \ ."| awk 'substr($1, 2) == ".s:pane_id." { print $2, $3, $4 }'"
+"         \ )
 "
 "     let [ session, window, pane ] = split(descriptor_list[0], ' ')
-"     let pane_descriptor = session.':'.window .'.'.pane
+"     let pane_descriptor = session .. ':' .. window .. '.' .. pane
 "
 " I got this code by reading the plugin `vim-tmuxify`:
 " https://github.com/jebaum/vim-tmuxify/blob/master/autoload/tmuxify.vim
@@ -101,7 +101,7 @@ endfu
 fu tmuxify#pane_command(bang, ...) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
-    if !exists(scope..'pane_id')
+    if !exists(scope .. 'pane_id')
         echom "tmuxify: I'm not associated with any pane! Run :TxCreate, or check whether you're using bang commands consistently."
         return
     endif
@@ -113,7 +113,7 @@ fu tmuxify#pane_command(bang, ...) abort "{{{1
         return
     endif
 
-    sil call system('tmux '..a:1..' -t '..pane_descriptor)
+    sil call system('tmux ' .. a:1 .. ' -t ' .. pane_descriptor)
 endfu
 
 fu tmuxify#pane_create(bang, ...) abort "{{{1
@@ -123,10 +123,10 @@ fu tmuxify#pane_create(bang, ...) abort "{{{1
         echom 'tmuxify: This Vim is not running in a tmux session!'
         return
 
-    elseif exists(scope..'pane_id')
+    elseif exists(scope .. 'pane_id')
         let pane_descriptor = s:get_pane_descriptor_from_id({scope}pane_id)
         if !empty(pane_descriptor)
-            echom "tmuxify: I'm already associated with pane ".pane_descriptor.'!'
+            echom "tmuxify: I'm already associated with pane " .. pane_descriptor .. '!'
             return
         endif
     endif
@@ -134,9 +134,9 @@ fu tmuxify#pane_create(bang, ...) abort "{{{1
     " capture the pane_id, as well as session, window, and pane index information
     " pane_id is unique, pane_index will change if the pane is moved
     let cmd = get(g:, 'tmuxify_custom_command', 'tmux split-window -d')
-            \ .." -PF '#D #S #I #P' | awk '{id=$1; session=$2; window=$3; pane=$4} END { print substr(id, 2), session, window, pane }'"
+        \ .. " -PF '#D #S #I #P' | awk '{id=$1; session=$2; window=$3; pane=$4} END { print substr(id, 2), session, window, pane }'"
     sil let [ pane_id, session, window, pane ] = map(
-        \  split(system(cmd), ' '),
+        \  system(cmd)->split(' '),
         \  'str2nr(v:val)'
         \ )
 
@@ -151,7 +151,7 @@ endfu
 fu tmuxify#pane_kill(bang) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
-    if !exists(scope..'pane_id')
+    if !exists(scope .. 'pane_id')
         echom "tmuxify: I'm not associated with any pane! Run :TxCreate, or check whether you're using bang commands consistently."
         return
     endif
@@ -161,7 +161,7 @@ fu tmuxify#pane_kill(bang) abort "{{{1
     if empty(pane_descriptor)
         echom 'tmuxify: The associated pane was already closed! Run :TxCreate.'
     else
-        sil call system('tmux kill-pane -t '..pane_descriptor)
+        sil call system('tmux kill-pane -t ' .. pane_descriptor)
     endif
 
     unlet {scope}pane_id
@@ -170,7 +170,7 @@ endfu
 fu tmuxify#pane_run(bang, ...) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
-    if !exists(scope..'pane_id') && !tmuxify#pane_create(a:bang)
+    if !exists(scope .. 'pane_id') && !tmuxify#pane_create(a:bang)
         return
     endif
 
@@ -184,40 +184,41 @@ fu tmuxify#pane_run(bang, ...) abort "{{{1
         let action = input('TxRun> ')
     endif
 
-    let g:tmuxify_run     = get(g:, 'tmuxify_run', {})
+    let g:tmuxify_run = get(g:, 'tmuxify_run', {})
     let g:tmuxify_run[ft] = action
 
-    call tmuxify#pane_send(a:bang, substitute(g:tmuxify_run[ft], '%', resolve(expand('%:p')), ''))
+    call substitute(g:tmuxify_run[ft], '%', expand('%:p')->resolve(), '')
+        \ ->tmuxify#pane_send(a:bang)
 endfu
 
-fu tmuxify#pane_send(bang, ...) abort "{{{1
+fu tmuxify#pane_send(lines = [], bang) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
-    if !exists(scope..'pane_id') && !tmuxify#pane_create(a:bang)
+    if !exists(scope .. 'pane_id') && !tmuxify#pane_create(a:bang)
         return
     endif
 
-    let pane_id         = {scope}pane_id
+    let pane_id = {scope}pane_id
     let pane_descriptor = s:get_pane_descriptor_from_id(pane_id)
     if empty(pane_descriptor)
         echom 'tmuxify: The associated pane was already closed! Run :TxCreate.'
         return
     endif
 
-    if exists('a:1')
-        for line in split(a:1, '\n')
+    if !empty(a:lines)
+        for line in split(a:lines, '\n')
             " `-l` disables key name lookup and sends the keys literally
             sil call system(
-                \ 'tmux send-keys -t '..pane_descriptor
-                \ ..' -l '..shellescape(s:fixstr(line))
-                \ ..' && tmux send-keys -t '..pane_descriptor
-                \ ..' C-m')
+                \ 'tmux send-keys -t ' .. pane_descriptor
+                \ .. ' -l ' .. shellescape(s:fixstr(line))
+                \ .. ' && tmux send-keys -t ' .. pane_descriptor
+                \ .. ' C-m')
         endfor
     else
         sil call system(
-                    \ 'tmux send-keys -t '..pane_descriptor
-                    \ ..' '..shellescape(s:fixstr(input('TxSend> ')))
-                    \ ..' C-m')
+            \ 'tmux send-keys -t ' .. pane_descriptor
+            \ .. ' ' .. input('TxSend> ')->s:fixstr()->shellescape()
+            \ .. ' C-m')
     endif
 endfu
 
@@ -225,9 +226,9 @@ fu tmuxify#pane_send_key(bang, cmd) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     "  ┌ if we don't have any info about a pane
-    "  │                            ┌ and we can't even create one
-    "  │                            │
-    if !exists(scope..'pane_id') && !tmuxify#pane_create(a:bang)
+    "  │                              ┌ and we can't even create one
+    "  │                              │
+    if !exists(scope .. 'pane_id') && !tmuxify#pane_create(a:bang)
         " gtfo
         return
     endif
@@ -239,7 +240,7 @@ fu tmuxify#pane_send_key(bang, cmd) abort "{{{1
     endif
 
     let keys = empty(a:cmd) ? input('TxSendKey> ') : a:cmd
-    sil call system('tmux send-keys -t '..pane_descriptor..' '..string(keys))
+    sil call system('tmux send-keys -t ' .. pane_descriptor .. ' ' .. string(keys))
 endfu
 
 fu tmuxify#pane_set(bang, ...) abort "{{{1
@@ -247,7 +248,7 @@ fu tmuxify#pane_set(bang, ...) abort "{{{1
 
     if a:0 == 1
         if a:1[0] == '%'
-            let descriptor_string = s:get_pane_descriptor_from_id(strpart(a:1, 1))
+            let descriptor_string = strpart(a:1, 1)->s:get_pane_descriptor_from_id()
             if empty(descriptor_string)
                 echo 'tmuxify: Invalid Pane ID!'
                 return
@@ -257,7 +258,7 @@ fu tmuxify#pane_set(bang, ...) abort "{{{1
             let [session, window, pane] = split(a:1, '\W')
         endif
     else
-        let descriptor = input('Session:Window.Pane> ',    '', 'custom,<SNR>'..s:SID()..'_complete_descriptor')
+        let descriptor = input('Session:Window.Pane> ', '', 'custom,<SNR>' .. expand('<SID>') .. '_complete_descriptor')
         let [session, window, pane] = split(descriptor, '\W')
     endif
 
@@ -265,16 +266,16 @@ fu tmuxify#pane_set(bang, ...) abort "{{{1
 
     sil let pane_id = system(
         \  "tmux list-panes -a -F '#D #S #I #P' | awk '$2 == \""
-        \ ..session
-        \ .."\" && $3 == \""
-        \ ..window
-        \ .."\" && $4 == \""
-        \ ..pane
-        \ .."\" {print substr($1, 2)}'"
+        \ .. session
+        \ .. "\" && $3 == \""
+        \ .. window
+        \ .. "\" && $4 == \""
+        \ .. pane
+        \ .. "\" {print substr($1, 2)}'"
         \ )
 
     if empty(pane_id)
-        redraw | echom 'tmuxify: There is no pane '..pane..'!'
+        redraw | echom 'tmuxify: There is no pane ' .. pane .. '!'
         return
     endif
 
@@ -282,11 +283,8 @@ fu tmuxify#pane_set(bang, ...) abort "{{{1
 endfu
 
 fu tmuxify#set_cmd(...) abort "{{{1
-    let g:tmuxify_run     = get(g:, 'tmuxify_run', {})
-    let ft                = !empty(&ft)   ? &ft : ' '
-    let g:tmuxify_run[ft] = exists('a:1') ? a:1 : input('TxSet('..ft..')> ')
+    let g:tmuxify_run = get(g:, 'tmuxify_run', {})
+    let ft = !empty(&ft) ? &ft : ' '
+    let g:tmuxify_run[ft] = exists('a:1') ? a:1 : input('TxSet(' .. ft .. ')> ')
 endfu
 
-fu s:SID() abort "{{{1
-    return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
-endfu
