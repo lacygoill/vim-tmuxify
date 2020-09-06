@@ -210,7 +210,7 @@ fu tmuxify#pane_send(lines = [], bang) abort "{{{1
             " `-l` disables key name lookup and sends the keys literally
             sil call system(
                 \ 'tmux send-keys -t ' .. pane_descriptor
-                \ .. ' -l ' .. shellescape(s:fixstr(line))
+                \ .. ' -l ' .. s:fixstr(line)->shellescape()
                 \ .. ' && tmux send-keys -t ' .. pane_descriptor
                 \ .. ' C-m')
         endfor
