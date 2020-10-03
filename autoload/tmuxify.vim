@@ -164,7 +164,7 @@ fu tmuxify#pane_kill(bang) abort "{{{1
         sil call system('tmux kill-pane -t ' .. pane_descriptor)
     endif
 
-    unlet {scope}pane_id
+    unlet! {scope}pane_id
 endfu
 
 fu tmuxify#pane_run(bang, ...) abort "{{{1
