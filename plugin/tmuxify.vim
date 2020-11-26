@@ -27,23 +27,23 @@ com -nargs=? -bar -bang TxSetPane call tmuxify#pane_set(      <bang>0, <f-args> 
 " Commented for the moment, because it would introduce lag for similar mappings in vimrc.
 " Integrate/Move tmux mappings from vimrc to this plugin.
 
-"     nno <silent> <bar>xc :<c-u>TxCancel<cr>
-"     nno <silent> <bar>xk :<c-u>TxSendKey<cr>
-"     nno <silent> <bar>xl :<c-u>TxClear<cr>
-"     nno <silent> <bar>xn :<c-u>TxCreate<cr>
-"     nno <silent> <bar>xp :<c-u>TxSetPane<cr>
-"     nno <silent> <bar>xq :<c-u>TxKill<cr>
-"     nno <silent> <bar>xr :<c-u>TxRun<cr>
-"     nno <silent> <bar>xs :<c-u>TxSend<cr>
-"     nno <silent> <bar>xt :<c-u>TxSetCmd<cr>
+"     nno <bar>xc <cmd>TxCancel<cr>
+"     nno <bar>xk <cmd>TxSendKey<cr>
+"     nno <bar>xl <cmd>TxClear<cr>
+"     nno <bar>xn <cmd>TxCreate<cr>
+"     nno <bar>xp <cmd>TxSetPane<cr>
+"     nno <bar>xq <cmd>TxKill<cr>
+"     nno <bar>xr <cmd>TxRun<cr>
+"     nno <bar>xs <cmd>TxSend<cr>
+"     nno <bar>xt <cmd>TxSetCmd<cr>
 "
-"                   ┌ do NOT use `!x`, it would prevent you from writing a visual selection
-"                   │ on the standard input of a shell command whose name begins with an `x`
-"                   │
-"                   │ do NOT use `!<c-x>`, it would introduce lag when we press `!` in visual mode
-"                   │
-"                   │ do NOT use `<c-x>!`, it would introduce lag when we want to decrease numbers
-"                   │
-"                   │ you COULD use `mx` though
-"                   │
-"     xno <silent>  <bar>x  "my:TxSend(@m)<cr>
+"         ┌ do NOT use `!x`, it would prevent you from writing a visual selection
+"         │ on the standard input of a shell command whose name begins with an `x`
+"         │
+"         │ do NOT use `!<c-x>`, it would introduce lag when we press `!` in visual mode
+"         │
+"         │ do NOT use `<c-x>!`, it would introduce lag when we want to decrease numbers
+"         │
+"         │ you COULD use `mx` though
+"         │
+"     xno <bar>x "my<cmd>TxSend(@m)<cr>
