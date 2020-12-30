@@ -23,7 +23,7 @@ fu s:fixstr(line) abort "{{{1
     " pfx : send-keys -t study:1.2 -l 'echo foo\;'
     "                                           │
     "                                           └ NOT removed
-    return line[-1:] == ';' ? line[:-2] .. '\;' : line
+    return line[-1 :] == ';' ? line[: -2] .. '\;' : line
 endfu
 
 fu s:get_pane_descriptor_from_id(pane_id) abort "{{{1
