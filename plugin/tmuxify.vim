@@ -6,8 +6,9 @@ let g:loaded_tmuxify = 1
 " commands {{{1
 
 " All these commands interact with a pane which is associated to:
-"         current buffer  if no bang
-"         current session if    bang
+"
+"     current buffer  if no bang
+"     current session if    bang
 "
 " Do we use global tmux panes or buffer local ones ? ──────────────┐
 "                                                                  │
