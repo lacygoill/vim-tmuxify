@@ -1,7 +1,7 @@
 if exists('g:loaded_tmuxify')
     finish
 endif
-let g:loaded_tmuxify = 1
+let g:loaded_tmuxify = v:true
 
 " commands {{{1
 
