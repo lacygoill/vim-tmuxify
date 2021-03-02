@@ -3,13 +3,13 @@ fu s:complete_descriptor(...) abort "{{{1
 endfu
 
 fu s:fixstr(line) abort "{{{1
-    let line = substitute(a:line, '\t', ' ', 'g')
+    let line = a:line->substitute('\t', ' ', 'g')
 
     " remove possible spaces after an ending backslash;
     " necessary if we want to send a visual block of shell code;
     " without, the trailing whitespace prevent the commands from working
     " properly (at least in zsh)
-    let line = substitute(a:line, '\\\s\+$', '\', '')
+    let line = a:line->substitute('\\\s\+$', '\', '')
 
     " if line ends with a semicolon, escape it, to prevent tmux from
     " interpreting it as a separator between 2 commands (and remove it)
@@ -135,10 +135,9 @@ fu tmuxify#pane_create(bang, ...) abort "{{{1
     " pane_id is unique, pane_index will change if the pane is moved
     let cmd = get(g:, 'tmuxify_custom_command', 'tmux split-window -d')
         \ .. " -PF '#D #S #I #P' | awk '{id=$1; session=$2; window=$3; pane=$4} END { print substr(id, 2), session, window, pane }'"
-    sil let [ pane_id, session, window, pane ] = map(
-        \  system(cmd)->split(' '),
-        \  'str2nr(v:val)'
-        \ )
+    sil let [pane_id, session, window, pane] = system(cmd)
+        \ ->split(' ')
+        \ ->map('str2nr(v:val)')
 
     if exists('a:1')
         call tmuxify#pane_send(a:bang, a:1)
@@ -187,7 +186,8 @@ fu tmuxify#pane_run(bang, ...) abort "{{{1
     let g:tmuxify_run = get(g:, 'tmuxify_run', {})
     let g:tmuxify_run[ft] = action
 
-    call substitute(g:tmuxify_run[ft], '%', expand('%:p')->resolve(), '')
+    eval g:tmuxify_run[ft]
+        \ ->substitute('%', expand('%:p')->resolve(), '')
         \ ->tmuxify#pane_send(a:bang)
 endfu
 
