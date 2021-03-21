@@ -177,7 +177,7 @@ fu tmuxify#pane_run(bang, ...) abort "{{{1
 
     if exists('a:1')
         let action = a:1
-    elseif exists('g:tmuxify_run') && has_key(g:tmuxify_run, ft) && !empty(g:tmuxify_run[ft])
+    elseif exists('g:tmuxify_run') && g:tmuxify_run->has_key(ft) && !empty(g:tmuxify_run[ft])
         let action = g:tmuxify_run[ft]
     else
         let action = input('TxRun> ')
