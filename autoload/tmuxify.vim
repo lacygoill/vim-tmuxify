@@ -173,7 +173,7 @@ fu tmuxify#pane_run(bang, ...) abort "{{{1
         return
     endif
 
-    let ft = !empty(&ft) ? &ft : ' '
+    let ft = !empty(&filetype) ? &filetype : ' '
 
     if exists('a:1')
         let action = a:1
@@ -284,7 +284,7 @@ endfu
 
 fu tmuxify#set_cmd(...) abort "{{{1
     let g:tmuxify_run = get(g:, 'tmuxify_run', {})
-    let ft = !empty(&ft) ? &ft : ' '
+    let ft = !empty(&filetype) ? &filetype : ' '
     let g:tmuxify_run[ft] = exists('a:1') ? a:1 : input('TxSet(' .. ft .. ')> ')
 endfu
 
