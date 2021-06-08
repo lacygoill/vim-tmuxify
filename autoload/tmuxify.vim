@@ -46,11 +46,11 @@ endfu
 " NOTE:
 " Here's a bit of code showing how to build a pane descriptor from a pane ID.
 "
-" A pane ID begins with a `%` sign; ex:
+" A pane ID begins with a `%` sign; e.g.:
 "
 "     %456
 "
-" A pane descriptor follows the format `session_name:window_index.pane_index`; ex:
+" A pane descriptor follows the format `session_name:window_index.pane_index`; e.g.:
 "
 "     study:1.2
 "
@@ -78,7 +78,7 @@ endfu
 "                      │  │            │  │  │  └ index of pane
 "                      │  │            │  │  └ index of window
 "                      │  │            │  └ name of session
-"                      │  │            └ unique pane ID (ex: %42)
+"                      │  │            └ unique pane ID (e.g.: %42)
 "                      │  │
 "     tmux list-panes -a -F '#D #S #I #P' | awk 'substr($1, 2) == 456 { print $2, $3, $4 }'
 "                                                │                            │
@@ -173,20 +173,22 @@ fu tmuxify#pane_run(bang, ...) abort "{{{1
         return
     endif
 
-    let ft = !empty(&filetype) ? &filetype : ' '
+    let filetype = !empty(&filetype) ? &filetype : ' '
 
     if exists('a:1')
         let action = a:1
-    elseif exists('g:tmuxify_run') && g:tmuxify_run->has_key(ft) && !empty(g:tmuxify_run[ft])
-        let action = g:tmuxify_run[ft]
+    elseif exists('g:tmuxify_run')
+        \ && g:tmuxify_run->has_key(filetype)
+        \ && !empty(g:tmuxify_run[filetype])
+        let action = g:tmuxify_run[filetype]
     else
         let action = input('TxRun> ')
     endif
 
     let g:tmuxify_run = get(g:, 'tmuxify_run', {})
-    let g:tmuxify_run[ft] = action
+    let g:tmuxify_run[filetype] = action
 
-    eval g:tmuxify_run[ft]
+    eval g:tmuxify_run[filetype]
         \ ->substitute('%', expand('%:p')->resolve(), '')
         \ ->tmuxify#pane_send(a:bang)
 endfu
@@ -284,7 +286,9 @@ endfu
 
 fu tmuxify#set_cmd(...) abort "{{{1
     let g:tmuxify_run = get(g:, 'tmuxify_run', {})
-    let ft = !empty(&filetype) ? &filetype : ' '
-    let g:tmuxify_run[ft] = exists('a:1') ? a:1 : input('TxSet(' .. ft .. ')> ')
+    let filetype = !empty(&filetype) ? &filetype : ' '
+    let g:tmuxify_run[filetype] = exists('a:1')
+        \ ? a:1
+        \ : input('TxSet(' .. filetype .. ')> ')
 endfu
 
