@@ -1,8 +1,8 @@
-fu s:complete_descriptor(...) abort "{{{1
-    sil return system('tmux list-panes -aF "#S:#I.#P"')
-endfu
+function s:complete_descriptor(...) abort "{{{1
+    silent return system('tmux list-panes -aF "#S:#I.#P"')
+endfunction
 
-fu s:fixstr(line) abort "{{{1
+function s:fixstr(line) abort "{{{1
     let line = a:line->substitute('\t', ' ', 'g')
 
     " remove possible spaces after an ending backslash;
@@ -24,10 +24,10 @@ fu s:fixstr(line) abort "{{{1
     "                                           │
     "                                           └ NOT removed
     return line[-1 :] == ';' ? line[: -2] .. '\;' : line
-endfu
+endfunction
 
-fu s:get_pane_descriptor_from_id(pane_id) abort "{{{1
-    sil let descriptor_list = systemlist(
+function s:get_pane_descriptor_from_id(pane_id) abort "{{{1
+    silent let descriptor_list = systemlist(
         \  "tmux list-panes -a -F '#D #S #I #P' | awk 'substr($1, 2) == "
         \ .. a:pane_id
         \ .. " { print $2, $3, $4 }'"
@@ -41,7 +41,7 @@ fu s:get_pane_descriptor_from_id(pane_id) abort "{{{1
         let [session, window, pane] = split(descriptor_list[0],' ')
         return session .. ':' .. window .. '.' .. pane
     endif
-endfu
+endfunction
 
 " NOTE:
 " Here's a bit of code showing how to build a pane descriptor from a pane ID.
@@ -54,7 +54,7 @@ endfu
 "
 "     study:1.2
 "
-"     sil let descriptor_list = systemlist(
+"     silent let descriptor_list = systemlist(
 "         \ "tmux list-panes -a -F '#D #S #I #P'"
 "         \ ."| awk 'substr($1, 2) == ".s:pane_id." { print $2, $3, $4 }'"
 "         \ )
@@ -98,35 +98,35 @@ endfu
 "         %123 study 1 2
 "         %456 study 1 2
 
-fu tmuxify#pane_command(bang, ...) abort "{{{1
+function tmuxify#pane_command(bang, ...) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope .. 'pane_id')
-        echom "tmuxify: I'm not associated with any pane! Run :TxCreate, or check whether you're using bang commands consistently."
+        echomsg "tmuxify: I'm not associated with any pane! Run :TxCreate, or check whether you're using bang commands consistently."
         return
     endif
 
     let pane_id = {scope}pane_id
     let pane_descriptor = s:get_pane_descriptor_from_id(pane_id)
     if empty(pane_descriptor)
-        echom 'tmuxify: The associated pane was already closed! Run :TxCreate.'
+        echomsg 'tmuxify: The associated pane was already closed! Run :TxCreate.'
         return
     endif
 
-    sil call system('tmux ' .. a:1 .. ' -t ' .. pane_descriptor)
-endfu
+    silent call system('tmux ' .. a:1 .. ' -t ' .. pane_descriptor)
+endfunction
 
-fu tmuxify#pane_create(bang, ...) abort "{{{1
+function tmuxify#pane_create(bang, ...) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists('$TMUX')
-        echom 'tmuxify: This Vim is not running in a tmux session!'
+        echomsg 'tmuxify: This Vim is not running in a tmux session!'
         return
 
     elseif exists(scope .. 'pane_id')
         let pane_descriptor = s:get_pane_descriptor_from_id({scope}pane_id)
         if !empty(pane_descriptor)
-            echom "tmuxify: I'm already associated with pane " .. pane_descriptor .. '!'
+            echomsg "tmuxify: I'm already associated with pane " .. pane_descriptor .. '!'
             return
         endif
     endif
@@ -135,7 +135,7 @@ fu tmuxify#pane_create(bang, ...) abort "{{{1
     " pane_id is unique, pane_index will change if the pane is moved
     let cmd = get(g:, 'tmuxify_custom_command', 'tmux split-window -d')
         \ .. " -PF '#D #S #I #P' | awk '{id=$1; session=$2; window=$3; pane=$4} END { print substr(id, 2), session, window, pane }'"
-    sil let [pane_id, session, window, pane] = system(cmd)
+    silent let [pane_id, session, window, pane] = system(cmd)
         \ ->split(' ')
         \ ->map('str2nr(v:val)')
 
@@ -145,28 +145,28 @@ fu tmuxify#pane_create(bang, ...) abort "{{{1
 
     let [ {scope}pane_id, {scope}session, {scope}window, {scope}pane ] = [ pane_id, session, window, pane]
     return 1
-endfu
+endfunction
 
-fu tmuxify#pane_kill(bang) abort "{{{1
+function tmuxify#pane_kill(bang) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope .. 'pane_id')
-        echom "tmuxify: I'm not associated with any pane! Run :TxCreate, or check whether you're using bang commands consistently."
+        echomsg "tmuxify: I'm not associated with any pane! Run :TxCreate, or check whether you're using bang commands consistently."
         return
     endif
 
     let pane_id = {scope}pane_id
     let pane_descriptor = s:get_pane_descriptor_from_id(pane_id)
     if empty(pane_descriptor)
-        echom 'tmuxify: The associated pane was already closed! Run :TxCreate.'
+        echomsg 'tmuxify: The associated pane was already closed! Run :TxCreate.'
     else
-        sil call system('tmux kill-pane -t ' .. pane_descriptor)
+        silent call system('tmux kill-pane -t ' .. pane_descriptor)
     endif
 
     unlet! {scope}pane_id
-endfu
+endfunction
 
-fu tmuxify#pane_run(bang, ...) abort "{{{1
+function tmuxify#pane_run(bang, ...) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope .. 'pane_id') && !tmuxify#pane_create(a:bang)
@@ -191,9 +191,9 @@ fu tmuxify#pane_run(bang, ...) abort "{{{1
     eval g:tmuxify_run[filetype]
         \ ->substitute('%', expand('%:p')->resolve(), '')
         \ ->tmuxify#pane_send(a:bang)
-endfu
+endfunction
 
-fu tmuxify#pane_send(lines = [], bang) abort "{{{1
+function tmuxify#pane_send(lines = [], bang) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     if !exists(scope .. 'pane_id') && !tmuxify#pane_create(a:bang)
@@ -203,28 +203,28 @@ fu tmuxify#pane_send(lines = [], bang) abort "{{{1
     let pane_id = {scope}pane_id
     let pane_descriptor = s:get_pane_descriptor_from_id(pane_id)
     if empty(pane_descriptor)
-        echom 'tmuxify: The associated pane was already closed! Run :TxCreate.'
+        echomsg 'tmuxify: The associated pane was already closed! Run :TxCreate.'
         return
     endif
 
     if !empty(a:lines)
         for line in split(a:lines, '\n')
             " `-l` disables key name lookup and sends the keys literally
-            sil call system(
+            silent call system(
                 \ 'tmux send-keys -t ' .. pane_descriptor
                 \ .. ' -l ' .. s:fixstr(line)->shellescape()
                 \ .. ' && tmux send-keys -t ' .. pane_descriptor
                 \ .. ' C-m')
         endfor
     else
-        sil call system(
+        silent call system(
             \ 'tmux send-keys -t ' .. pane_descriptor
             \ .. ' ' .. input('TxSend> ')->s:fixstr()->shellescape()
             \ .. ' C-m')
     endif
-endfu
+endfunction
 
-fu tmuxify#pane_send_key(bang, cmd) abort "{{{1
+function tmuxify#pane_send_key(bang, cmd) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     "  ┌ if we don't have any info about a pane
@@ -237,15 +237,15 @@ fu tmuxify#pane_send_key(bang, cmd) abort "{{{1
 
     let pane_descriptor = s:get_pane_descriptor_from_id({scope}pane_id)
     if empty(pane_descriptor)
-        echom 'tmuxify: The associated pane was already closed! Run :TxCreate.'
+        echomsg 'tmuxify: The associated pane was already closed! Run :TxCreate.'
         return
     endif
 
     let keys = empty(a:cmd) ? input('TxSendKey> ') : a:cmd
-    sil call system('tmux send-keys -t ' .. pane_descriptor .. ' ' .. string(keys))
-endfu
+    silent call system('tmux send-keys -t ' .. pane_descriptor .. ' ' .. string(keys))
+endfunction
 
-fu tmuxify#pane_set(bang, ...) abort "{{{1
+function tmuxify#pane_set(bang, ...) abort "{{{1
     let scope = !a:bang ? 'b:' : 'g:'
 
     if a:0 == 1
@@ -266,7 +266,7 @@ fu tmuxify#pane_set(bang, ...) abort "{{{1
 
     let [ {scope}session, {scope}window, {scope}pane ] = [session, window, pane]
 
-    sil let pane_id = system(
+    silent let pane_id = system(
         \  "tmux list-panes -a -F '#D #S #I #P' | awk '$2 == \""
         \ .. session
         \ .. "\" && $3 == \""
@@ -277,18 +277,18 @@ fu tmuxify#pane_set(bang, ...) abort "{{{1
         \ )
 
     if empty(pane_id)
-        redraw | echom 'tmuxify: There is no pane ' .. pane .. '!'
+        redraw | echomsg 'tmuxify: There is no pane ' .. pane .. '!'
         return
     endif
 
     let {scope}pane_id = str2nr(pane_id)
-endfu
+endfunction
 
-fu tmuxify#set_cmd(...) abort "{{{1
+function tmuxify#set_cmd(...) abort "{{{1
     let g:tmuxify_run = get(g:, 'tmuxify_run', {})
     let filetype = !empty(&filetype) ? &filetype : ' '
     let g:tmuxify_run[filetype] = exists('a:1')
         \ ? a:1
         \ : input('TxSet(' .. filetype .. ')> ')
-endfu
+endfunction
 
