@@ -28,23 +28,23 @@ command -nargs=? -bar -bang TxSetPane call tmuxify#pane_set(      <bang>0, <f-ar
 " Commented for the moment, because it would introduce lag for similar mappings in vimrc.
 " Integrate/Move tmux mappings from vimrc to this plugin.
 
-"     nnoremap <Bar>xc <Cmd>TxCancel<CR>
-"     nnoremap <Bar>xk <Cmd>TxSendKey<CR>
-"     nnoremap <Bar>xl <Cmd>TxClear<CR>
-"     nnoremap <Bar>xn <Cmd>TxCreate<CR>
-"     nnoremap <Bar>xp <Cmd>TxSetPane<CR>
-"     nnoremap <Bar>xq <Cmd>TxKill<CR>
-"     nnoremap <Bar>xr <Cmd>TxRun<CR>
-"     nnoremap <Bar>xs <Cmd>TxSend<CR>
-"     nnoremap <Bar>xt <Cmd>TxSetCmd<CR>
+"     nnoremap <unique> <Bar>xc <Cmd>TxCancel<CR>
+"     nnoremap <unique> <Bar>xk <Cmd>TxSendKey<CR>
+"     nnoremap <unique> <Bar>xl <Cmd>TxClear<CR>
+"     nnoremap <unique> <Bar>xn <Cmd>TxCreate<CR>
+"     nnoremap <unique> <Bar>xp <Cmd>TxSetPane<CR>
+"     nnoremap <unique> <Bar>xq <Cmd>TxKill<CR>
+"     nnoremap <unique> <Bar>xr <Cmd>TxRun<CR>
+"     nnoremap <unique> <Bar>xs <Cmd>TxSend<CR>
+"     nnoremap <unique> <Bar>xt <Cmd>TxSetCmd<CR>
 "
-"              ┌ do NOT use `!x`, it would prevent you from writing a visual selection
-"              │ on the standard input of a shell command whose name begins with an `x`
-"              │
-"              │ do NOT use `!<C-X>`, it would introduce lag when we press `!` in visual mode
-"              │
-"              │ do NOT use `<C-X>!`, it would introduce lag when we want to decrease numbers
-"              │
-"              │ you COULD use `mx` though
-"              │
-"     xnoremap <Bar>x "my<Cmd>TxSend(@m)<CR>
+"                       ┌ do NOT use `!x`, it would prevent you from writing a visual selection
+"                       │ on the standard input of a shell command whose name begins with an `x`
+"                       │
+"                       │ do NOT use `!<C-X>`, it would introduce lag when we press `!` in visual mode
+"                       │
+"                       │ do NOT use `<C-X>!`, it would introduce lag when we want to decrease numbers
+"                       │
+"                       │ you COULD use `mx` though
+"                       │
+"     xnoremap <unique> <Bar>x "my<Cmd>TxSend(@m)<CR>
